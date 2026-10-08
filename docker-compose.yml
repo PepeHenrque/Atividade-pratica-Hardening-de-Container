@@ -2,13 +2,55 @@ services:
 
   app:
     build: .
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
       - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=banco
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - banco
+    networks:
+      - internal-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.10'
+          memory: 64M
 
   banco:
-    image: mysql:latest
+    image: mysql:8.0
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: sistema
-    ports:
-      - "3306:3306"
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "3306"
+    networks:
+      - internal-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+
+networks:
+  internal-network:
+    driver: bridge

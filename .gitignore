@@ -1,0 +1,12 @@
+# Arquivos de variáveis de ambiente com segredos sensíveis
+.env
+.env.local
+.env.*.local
+
+# Dependências
+node_modules/
+npm-debug.log*
+
+# Dados locais
+mysql_data/
+
